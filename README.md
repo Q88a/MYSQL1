@@ -1,16 +1,16 @@
 # mysql学习过程
 
-## 1课前操作和基础信息
+## 1 课前操作和基础信息
 电脑上本来就有mysql8.4。同时因为觉得打字和终端操作还得练，所以选择凭gitbash完成操作。（才不是懒得下workbench）
 
-## 2运行顺序
-确定已经有名为bookshop的专用库（不是的话要改名），且命令行窗口根目录在sql文件夹以后，执行一次以下命令并输入mysql密码（是的如果用bash要输三次这是正常的 暂时没想到怎么优化）（还有cmd版本的命令优化是抄ds的 我cmd没基础（）不过两版都测试过的）。  
+## 2 运行顺序
+确定已有名为bookshop的专用库（不是的话要改名），且命令行窗口的当前路径已经切换到了sql文件夹下后，执行一次以下命令并输入mysql密码（命令优化是抄ds的 我命令基础不太好（）不过两版都测试过的）。  
 然后把最后的输出与queries.sql里的注释比较。  
-注意：会把原authors和books清空。
+注意：会把原authors和books清空，原数据会丢失。
 
 bash版本：
 ```
-mysql -u root -p --default-character-set=utf8mb4 bookshop < schema.sql;mysql -u root -p --default-character-set=utf8mb4 bookshop < seed.sql;mysql -u root -p --default-character-set=utf8mb4 bookshop < queries.sql;
+cat schema.sql seed.sql queries.sql | mysql -u root -p --default-character-set=utf8mb4 bookshop
 ```
 
 cmd版本：
@@ -18,7 +18,21 @@ cmd版本：
 ( type schema.sql & type seed.sql & type queries.sql ) | mysql -u root -p --default-character-set=utf8mb4 bookshop
 ```
 
-## 3解释主键与外键 和验证的边界条件
+## 3 解释主键与外键/验证的边界条件/遇到的问题
+
+主键和外键的关系像外键不能独活。外键一定不能不对应一个主键，所以不能先删主键表，不然外键会拦着。  
+验证的边界：  
+```sql
+SELECT "Q4";
+SELECT b.title ,b.price,a.name
+FROM books AS b 
+JOIN authors AS a ON a.id = b.author_id;
+```
+这段一开时还select了a.id和b.author_id。因为想的是如果不把这两个数据“拿出来”，那怎么判断它们相等呢？后来结果太丑了，删掉试了试。才发现select管的只是打印出来的数据。  
+
+遇到问题：  
+明明vscode,数据库，和.sql文件的开头规定用的字符集都是utf-8，中文还是乱码。询问ds后得知可能是win下的gitbash用GBK输出，命令加上--default-character-set=utf8mb4选项后就好了。
+
 
 ## （有点啰嗦 可以不看）课中碎碎念
 
